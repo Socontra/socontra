@@ -1,0 +1,2 @@
+client_public_id = 'socontra_demo'     # Place your unique company ID here
+client_security_token = '6X76NRw2HsmpCp4vsZDnkuQv4ETXOwuPRpaYCNs92xKv7SUQx7SdBH27WCOM9puT'      # Place your security token here.
