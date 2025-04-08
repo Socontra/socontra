@@ -4,6 +4,10 @@
 # externally developed specialized agents anywhere in the world) that can achieve/fulfill the task, and the 
 # orchestrator wants to assess the different options to optimize the outcome.
 
+# Refer to the pdf file "Socontra service protocols.pdf" in the main folder, and protocol modules:
+# - Consumer: protocol_templates/service/socontra_allocate_protocol_consumer.py
+# - Suppliers: protocol_templates/service/socontra_allocate_protocol_supplier.py
+
 #### INTRODUCTION
 
 # Key characteristics of AI agents are autonomy (or agency) and decentralization (i.e. self-control and self-interest).
@@ -68,9 +72,6 @@
 # up of the the task in order to piece together services to solve the problem in unanticipated (and potentially optimal) ways 
 # based on the agents and their capabilities/services available at the time. This will be released at a later date.
 
-# In this demo we utilize the delegate service protocols:
-# - Consumer: protocol_templates/service/socontra_allocate_protocol_consumer.py
-# - Suppliers: protocol_templates/service/socontra_allocate_protocol_supplier.py
 
 
 from socontra.socontra import Socontra

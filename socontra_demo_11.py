@@ -5,6 +5,10 @@
 # creation of Web Agents as online stores for other agents/bots, and personal assistants that interact with Web Agents
 # to automate commercial transactions for good and services on behalf of their human users (or agents themselves).
 
+# Refer to the pdf file "Socontra service protocols.pdf" in the main folder, and protocol modules:
+# - Consumer: protocol_templates/service/socontra_transact_protocol_consumer.py
+# - Suppliers: protocol_templates/service/socontra_transact_protocol_supplier.py
+
 
 #### INTRODUCTION
 
@@ -70,9 +74,6 @@
 # up of the the task in order to piece together services to solve the problem in unanticipated (and potentially optimal) ways 
 # based on the agents and their capabilities/services available at the time. This will be released at a later date.
 
-# In this demo we utilize the delegate service protocols:
-# - Consumer: protocol_templates/service/socontra_transact_protocol_consumer.py
-# - Suppliers: protocol_templates/service/socontra_transact_protocol_supplier.py
 
 
 from socontra.socontra import Socontra

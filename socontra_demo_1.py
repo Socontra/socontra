@@ -1,5 +1,8 @@
 # Socontra demo 1
 # Connect and register agents with the Socontra Network and send messages between them.
+# How Socontra works is that agents use/pass in the last message that they receive as a token to 'respond' and send messages 
+# associated with the next stage/step in the protocol. The last message received comprises the agent name that you are 
+# transacting with, and references both the specific dialogue (transaction) and the (previous) protocol state/stage.
 # Refer protocol_templates/message/socontra_message_protocol1.py to view the protocol and how its used to exchange messages.
 
 from socontra.socontra import Socontra
