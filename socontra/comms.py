@@ -8,6 +8,7 @@ import time
 
 from socontra.agent_database import AgentDatabase
 from sseclient import SSEClient
+import config 
 
 # Variable to store the Socontra Interface object reference so that we can redirect messages to the Socontra object.
 global socontra_interface_object_ref, agent_db_object_ref
@@ -99,7 +100,7 @@ def prepare_agent_api(agent_name, soc_intfce_object_ref):
 
 
 def agent_receive_messages(agent_name, clear_backlog, agent_connected):
-    url = "http://127.0.0.1:8000/agent_message/receive_message"
+    url = config.socontra_network_url_sse
     print('Starting agent connection to Socontra Network', agent_name)
 
     while True:
@@ -108,8 +109,9 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
             access_token = get_access_token(agent_name)
 
             response = requests.get(url, json={'agent_name': agent_name, 'clear_backlog': clear_backlog}, stream=True, headers=access_token)
+
             client = SSEClient(response)
-            
+
             agent_connected['agent_connected'] = True
 
             for event in client.events():
@@ -230,6 +232,8 @@ def recreate_agent_same_credentials(agent_name, client_security_token):
         agent_db(agent_name).update_agent_data(response.message)
 
         response.http_response = 'Agent already registered and recreated via Soncontra Network.'
+    else:
+        print('Error connecting to the Socontra Network.', response.status_code, response.http_response)
 
     return response
 
@@ -268,7 +272,17 @@ def send_auth_message(agent_name, json_message, path, api_crud_type):
             res = _send_auth_request(api_crud_type, socontra_network_url, socontra_network_api_port, socontra_network_path, json_message, access_token)
         else:
             return False
-
+    
+    # If there is an error on the Socontra Network, print a message and return from this function.
+    if res.status_code == 500:
+        print('There was an error on the Socontra Network. Action could not be completed.')
+        return MessageHTTPResponse({
+                'success': False,
+                'http_response': res.content,
+                'message': 'There was an error on the Socontra Network. Action could not be completed.',
+                'status_code': res.status_code
+            })
+    
     try:
         response_dict = json.loads(res.content)
     except:

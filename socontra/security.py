@@ -4,13 +4,14 @@ import secrets
 import string
 from cryptography.fernet import Fernet
 import base64
+import config
 
 letters = string.ascii_letters
 digits = string.digits
 alphabet = letters + digits
 
 # TODO - make dynamic for each client or agent.
-fernet = Fernet(b"_NC755LPWhnD5jk8qHhH4HsNJZ32D6a-yGT3qx2rOMs=")
+fernet = Fernet(config.fernet_key)
 
 # Generate random and secure passwords or security tokens.
 def generate_password(password_length):

@@ -7,13 +7,13 @@ import time
 import json 
 import time
 import os
-
+import config 
 
 class AgentDatabase:
 
     def __init__(self):
-        self.socontra_network_url = 'http://127.0.0.1'
-        self.socontra_network_port = 8000
+        self.socontra_network_url = config.socontra_network_url
+        self.socontra_network_port = config.socontra_network_port
         
         self.socontra_network_urlport = f'{self.socontra_network_url}:{str(self.socontra_network_port)}'
         
