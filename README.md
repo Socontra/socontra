@@ -31,7 +31,7 @@ For more information about these features, see the notes at the top of each soco
 
 More about the founder Dr Don Perugini
 
-Dr Don Perugin has spent 25 years working in the area of AI agents. Don did his PhD with The University of Melbourne (global rank #13) and spent the first 10 years of his career in the Department of Defence studying cognitive agents and agent protocols to facilitate agent interoperability and automated commercial transactions. 
+Dr Don Perugini has spent 25 years working in the area of AI agents. Don did his PhD with The University of Melbourne (global rank #13) and spent the first 10 years of his career in the Department of Defence studying cognitive agents and agent protocols to facilitate agent interoperability and automated commercial transactions. 
 
 Don's first global AI startup, ISD Analytics, operated out of San Francisco Bay area and Australia, used large scale multi-agents to simulate and predict the behavior of populations of consumers. ISD analytics was acquired by EY in 2015. 
 
