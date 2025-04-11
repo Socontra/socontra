@@ -2,7 +2,7 @@
 # Agents use this Socontra Client to connect to the Socontra network and find, connect, interact and transact to other agents.
 
 from socontra.comms import MessageHTTPResponse, Message, send_auth_message, return_message_object, prepare_agent_api, agent_already_registered, \
-                            register_new_agent, recreate_agent_same_credentials, agent_receive_messages
+                            register_new_agent, recreate_agent_same_credentials, agent_receive_messages, is_agent_already_registered
 
 import queue
 import time
@@ -81,23 +81,31 @@ class Socontra:
 
         prepare_agent_api(agent_data['agent_name'], self)
 
-        # If new_agent - lets check if the agent credentials already stored in our database (files in folder socontra/database/). 
-        response = agent_already_registered(agent_data['agent_name'], agent_data)
+        if is_agent_already_registered(agent_data['agent_name']):
+            # If new_agent - lets check if the agent credentials already stored in our database (files in folder socontra/database/). 
+            response = agent_already_registered(agent_data['agent_name'], agent_data)
 
-        # Can return the response below that agent created locally as already registered. However, if not, then try registering a new agent.
-        if not response:
-            # Need to register as a new agent with the Socontra Network.
-            response = register_new_agent(agent_data['agent_name'], agent_data, agent_owner_data, agent_owner_transaction_config)
-            if not response.success:
-                # Tried to register as a new agent and the name exists.
-                response_recreate = recreate_agent_same_credentials(agent_data['agent_name'], agent_data['client_security_token'])
-                if not response_recreate.success:                
-                    # Otherwise, return False (i.e conflict) - since an agent with same same name but different credentials exists,
-                    # so can't create a new agent. Return the response from register_new_agent() above.
-                    return response
+            if not response:
+                # Agent names exists. Will try to recreate the agent - if the agent is an existing registered agent trying to reconnect.
+                if 'human_password' in agent_data:
+                    response_recreate = recreate_agent_same_credentials(agent_data['agent_name'], agent_data['client_security_token'], agent_data['human_password'])
+                    if not response_recreate.success:                
+                        # Can't create the agent (i.e conflict or unauthorized) - since an agent with same same name but different credentials exists.
+                        raise ValueError('Could not create agent. Agent with the same name exists, no local data about the agent exists, and human_password provided does not match with existing agent that is registered.')                        
+                    else:
+                        response=response_recreate
                 else:
-                    response=response_recreate
-        
+                    raise ValueError('Could not create agent. Agent with the same name exists and no local data about the agent exists. If reconnecting the agent, please provide a human_password and client_security_token to authenticate your registered agent.')
+        else:
+            # Agent not registered. Need to register as a new agent with the Socontra Network.
+            response = register_new_agent(agent_data['agent_name'], agent_data, agent_owner_data, agent_owner_transaction_config)
+
+            if response.status_code == 422:
+                print('http error response', response.contents)
+                raise ValueError('Agent registration fields are not valid. Please check and try again. See print message.')
+            elif response.status_code == 401:
+                raise ValueError('Client could not be validated. Could not register agent. Re-check your client_public_id and client_security_token, or make sure you are registered with the Socontra Network.')
+                
         # Connect the agent to the Socontra Network to receive messages via Server-Sent Events (SSE).
         self.connect_agent_to_socontra_network(agent_data['agent_name'], clear_backlog)
 

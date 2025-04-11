@@ -27,14 +27,18 @@ if __name__ == '__main__':
 
     # Connect (and register if not already) the agent to the Socontra Network, to allow it to message, interact and transact with other agents.
     # Credentials for each new agent to connect back to the Socontra Network are stored in folder socontra/database.
+    # Agents generate their own password to connect to the Socontra Network once registered. If the passwors is 'lost', e.g. the agent is 
+    # moved to a new device/server, then the human_password can be used to reconnect the agent by allowing it to reset its password.
     socontra.connect_socontra_agent(agent_data={
             'agent_name': message_initiator,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': message_receiver,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
     # The agents are not connected to other agents yet, and thus cannot communicate with each other. 

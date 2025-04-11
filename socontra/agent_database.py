@@ -58,7 +58,7 @@ class AgentDatabase:
 
         self.socontra_access_token = None
 
-        # TODO - Agent payment info.
+        # TODO - Agent payment info. To be handled by agent developers?
 
 
     def store_register_agent_details(self, agent_data: dict, agent_owner_data: dict = None, agent_owner_transaction_config: dict = None):
@@ -98,34 +98,25 @@ class AgentDatabase:
         # This function will just go through the edit list and make the changes.
 
         if data_to_edit:
-            agent_data = False
-            agent_owner_data = False
-            agent_owner_transaction_config = False
             
             for k, v in data_to_edit.items():
                 if v != None: # Make sure an item wanting to edit and not None
                     # Now need to make the edit. However, not sure which database. So find the database and make the edit.
                     if k in self.agent_data:
                         self.agent_data[k] = v
-                        agent_data = True
                     elif k in self.agent_owner_data:
                         self.agent_owner_data[k] = v
-                        agent_owner_data = True
                     elif k in self.agent_owner_transaction_config:
                         self.agent_owner_transaction_config[k] = v
-                        agent_owner_transaction_config = True
 
             # Now  save the edited database to file.
-            if agent_data:
-                self.store_data_to_file(self.agent_data, 'agent_data')
-            if agent_owner_data:
-                self.store_data_to_file(self.agent_owner_data, 'agent_owner_data')
-            if agent_owner_transaction_config:
-                self.store_data_to_file(self.agent_owner_transaction_config, 'agent_owner_transaction_config')
+            self.store_data_to_file(self.agent_data, 'agent_data')
+            self.store_data_to_file(self.agent_owner_data, 'agent_owner_data')
+            self.store_data_to_file(self.agent_owner_transaction_config, 'agent_owner_transaction_config')
 
     def store_data_to_file(self, data: dict, filename_key: str):
         # Will store the data to a file in folder 'database'.
-        
+
         # Set the updated field to current time.
         data['updated_at'] = time.time()
         agent_name =self.agent_data['agent_name']
@@ -197,7 +188,7 @@ class AgentDatabase:
         return decrypt_password(self.agent_data['encrypted_client_security_token'])
     
     def update_client_security_token(self, client_security_token: str, save_to_file=True):
-        # Will update the client security token - used to allow all the agenst from the agent's developers to access the Socontra network.
+        # Will update the client security token - used to allow all the agents from the agent's developers to access the Socontra network.
         self.agent_data['encrypted_client_security_token']= encrypt_password(client_security_token),
 
         # Now save to file.

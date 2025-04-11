@@ -58,11 +58,13 @@ if __name__ == '__main__':
     socontra.connect_socontra_agent(agent_data={
             'agent_name': group_admin_agent,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': group_member_1,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
     # Agent group_admin_agent will create two new groups:

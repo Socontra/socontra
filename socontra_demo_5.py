@@ -10,8 +10,8 @@
 
 # In this demo, we demonstrate direct connections (follow and unfollow), and how this opens or restricts 
 # agent interactions. So if you are developing agents as a personal assistant, then this can help human
-# users directly connect their agents (i.e. allow interactions) with family, friends and co-workers.
-# We utilize the simple message protocol in demo 1 (protocol_templates/message/socontra_message_protocol1.py).
+# users directly connect their own agents (i.e. allow interactions) with agents that represent their family, friends 
+# and co-workers. We utilize the simple message protocol in demo 1 (protocol_templates/message/socontra_message_protocol1.py).
 
 
 from socontra.socontra import Socontra
@@ -39,11 +39,13 @@ if __name__ == '__main__':
     socontra.connect_socontra_agent(agent_data={
             'agent_name': message_initiator,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': message_receiver,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
     # Disconnect agents from the client_group so that they are no longer connected, and thus can't interact.

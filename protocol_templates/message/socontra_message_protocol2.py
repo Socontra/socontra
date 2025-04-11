@@ -62,7 +62,7 @@ def my_guess_response(agent_name: str, received_message: Message, message_respon
 @route('socontra_demo:message_initiator', 'my_guess_response', 'message', 'my_new_protocol', 'add_random_numbers')
 # -> response: NoComms or reply message (via socontra.reply_message() or socontra.reply_all_message())
 def my_guess_response(agent_name: str, received_message: Message, message_responding_to: Message):
-    # Examples of using different roles for similar messages. THis endpoint not used in demo.
+    # Examples of using different roles for similar messages. This endpoint not used in demo.
 
     # The role above is 'orchestrator', with a purpose of finding the best agent (the one that guesses correctly).
     # Here, the role is 'add_random_numbers' for the same message_type = 'my_guess_response' with a different 

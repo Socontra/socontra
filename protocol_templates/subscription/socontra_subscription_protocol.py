@@ -24,6 +24,6 @@ def receive_new_broadcast(agent_name: str, received_message: Message):
 
     # New broadcasts can change the message_type ('socontra_broadcast'), protocol ('socontra') and recipient_type ('recipient')
     # to configure a unique broadcast endpoint for specific purposes, rather than rely on this general broadcast endpoint.
-    print('\nNew broadcast from', received_message.sender_name, ' which is ', received_message.message, 'for agent', agent_name)
+    print(f'\nNew broadcast from {received_message.sender_name} which is {received_message.message} for agent {agent_name}\n')
 
 

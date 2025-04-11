@@ -47,24 +47,25 @@
 #                       ####    Task -> Proposal -> Offer -> Order   #####
 # - Task - A goal, piece of work or outcome that a consumer wants achieved or fulfilled. This is analogous to 
 #           a search request in online stores.
-# - Proposal - Non-commital exchange of options for how the supplier can achieve the task. This is analogous to 
+# - Proposal - Non-committal exchange of options for how the supplier can achieve the task. This is analogous to 
 #               product search results in online stores.
 # - Offer - A proposal which the supplier (legally) commits to, i.e. a formal binding offer for the consumer.
 #           This is analogous to 'add to cart' in online stores, ready for final purchase (acceptance) from the consumer.
-# - Order - The consumer accepts the offer to create a mutually accepted/signed agreement. Both parties must execute their 
-#           agreed obligations, e.g. the consumer makes payment (if applicable) and the supplier executed and delivers
+# - Order - The consumer accepts the offer to create a mutually accepted/signed agreement. Both parties are bound and must 
+#           execute their agreed obligations, e.g. the consumer makes payment (if applicable) and the supplier executes and delivers
 #           the agreed order. This is analogous to 'purchase items in cart' in online stores.
 
 # Socontra provides a set of commands that facilitate the transactions via messages between agents. Socontra provides 
 # the framework and logic behind the transation, and the social network and communication layer. However the content of 
-# the messages is up to the developer, which is dependent on the application.
+# the messages is up to the developer, which is dependent on the application. Provide three 'standard' templates/protocols,
+# however developers can modify or create their own service protocols for any type of transaction.
 
-# Note that we dont always go through all 4 stages of a transaction. In the first demo, delegation, to simplify 
-# the transaction for applications such as agents delegating tasks one-on-one to other agents in an internal system 
-# we only use Offer -> Order.
-# The next demo, we describe a protocol for allocation, which uses Proposal -> Offer -> Order. This is also suited to agent
+# Note that we dont always use all 4 stages of a transaction. The demo 9: 'delegation' protocol, simplifies
+# the transaction for applications such as agents delegating tasks one-on-one to other agents in an internal system. 
+# In this case, we only use Offer -> Order.
+# The next demo, we describe a protocol for 'allocation', which uses Proposal -> Offer -> Order. This is also suited to agent
 # interaction in an internal system, but provides exploratory search for options to achieve the task to asist with orchestration.
-# The final demo we provide a template for the transact protocol, which goes through the full 4 stages of the transaction. This is
+# The final demo we provide a template for the 'transact' protocol, which goes through the full 4 stages of the transaction. This is
 # suited to commercial transactions and online stores which involve payments and formal legal underpinnings.
 
 # There is one more protocol which has not yet been implemented, designed during my PhD and time at Department of Defence. 
@@ -101,21 +102,25 @@ if __name__ == '__main__':
     socontra.connect_socontra_agent(agent_data={
             'agent_name': consumer_agent,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': supplier_agent1,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': supplier_agent2,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': supplier_agent3,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
     # Both agents join the client_group so that they are connected and can interact with each other.

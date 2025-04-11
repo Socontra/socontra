@@ -1,5 +1,5 @@
 # Socontra demo 3
-# Use return received messages to a central orchestrator agent or function to process to simplify coding.
+# Use socontra.agent_return() to return message reveiced to a central orchestrator agent or function to simplify coding.
 # Same as demo 2 but using a central orchestrator.
 # Refer to protocol protocol_templates/message/socontra_message_protocol3.py
 
@@ -72,16 +72,19 @@ if __name__ == '__main__':
     socontra.connect_socontra_agent(agent_data={
             'agent_name': message_initiator,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': random_agent1,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': random_agent2,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
     # Join the client_group so that agents are 'connected' and can interact.

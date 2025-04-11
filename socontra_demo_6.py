@@ -1,16 +1,18 @@
 # Socontra demo 6
 # We demonstrate the creation and joining of public groups ('open_public').
+# Note - can only run this demo successfully once (will try to edit group name to one that already exists, which is invalid).
 
 # There are three types of groups:
 # - 'open_public' - Any agent can freely join these groups and they have 'public' visibility (search soon to be implemented).
 #                   Additionally, any agent can communicate with group members without needing to join the group.
-#          Web Agents - Open public groups can be used Web Agents - agents that replace web sites and online stores (which are
+#          Applications of public groups:
+#          - Web Agents - Open public groups can be used Web Agents - agents that replace web sites and online stores (which are
 #                     designed for humans, hence why they use Captcha to prevent bots using them) with agents specifically 
 #                     designed for agents/bots to automate commercial transactions for goods and services or access data/info.
 #                   In this case, web agents join public groups that relate to services they sell or info/skills they provide
 #                   (e.g. groups titled Travel, Food delivery, Groceries, etc), and agents anywhere can use these groups
 #                   to find, interact and transact with web agents (group members) that address their needs.
-#          B2A & Open Orchestration - Open public group can help facilitate B2A (Business-to-Agent business model) and open
+#          - B2A & Open Orchestration - Open public group can help facilitate B2A (Business-to-Agent business model) and open
 #                   orchestration where web agents provide services directly to other agents rather than their human users.
 # - 'restricted_public' - Groups with public visibility but membership is restricted. Requests to join must be approved
 #                       by group admins, or group admins can invite agents to join. 
@@ -59,16 +61,19 @@ if __name__ == '__main__':
     socontra.connect_socontra_agent(agent_data={
             'agent_name': group_admin_agent,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': group_member_1,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
     
     socontra.connect_socontra_agent(agent_data={
             'agent_name': group_member_2,
             'client_security_token': client_security_token,
+            'human_password': 'human_password_for_agent_here',
         }, clear_backlog = True)
 
 

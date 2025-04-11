@@ -110,6 +110,10 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
 
             response = requests.get(url, json={'agent_name': agent_name, 'clear_backlog': clear_backlog}, stream=True, headers=access_token)
 
+            if response.status_code >= 400:
+                print("Could not connect agent to the Socontra Network.")
+                return response
+
             client = SSEClient(response)
 
             agent_connected['agent_connected'] = True
@@ -139,35 +143,47 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
 
 # Agent registration functions.
 
+def is_agent_already_registered(agent_name):
+    # Will check with the Socontra Server to see if the agent name is already registered.
+    json = {'agent_name': agent_name}
+    response = send_auth_message(agent_name, json, '/agent_auth/check_agent_name', 'GET')
+    return not response.success
+
 def agent_already_registered(agent_name, agent_data):
     # Will check if the agent has already been registered by checking if the agent exists and is stored in the local Socontra Interface 
     # database. If so, then the agent was just shut down and started again.
+
     if agent_db(agent_name).recreate_agent_if_exists(agent_data):
 
-        # Create an artificial response object to send back - dont need to communicate with the Socontra Network.
-        response_to_return = MessageHTTPResponse({
-            'success': True,
-            'message': None,
-            'http_response': 'Agent already registered and created locally',
-            'status_code': 200
-        })
-        return response_to_return
-    else:
-        return False
+        # Check if the password is still valid. If the agent with the same name runs on a separate device/server,
+        # creating its own password, making the password on this current device invalid. Agent password needs to be reset.
+        # To find out, we will simply ask for an access token from the Socontra Network, which uses the stored password.
+        access_token = get_access_token(agent_name)
+
+        if not access_token:
+            return False
+        else:
+            # Create an artificial response object to send back.
+            return MessageHTTPResponse({
+                'success': True,
+                'message': None,
+                'http_response': 'Agent already registered and created locally',
+                'status_code': 200
+            })
 
 
 def register_new_agent(agent_name, agent_data, agent_owner_data, agent_owner_transaction_config):
     # Will register the new agent with the Socontra Network.
     # Requires a single json file with the merge of all agent_data + agent_owner_data + agent_owner_transaction_config.
 
-    # Agent data is mandatory. SO can start with a copy of it.
+    # Agent data is mandatory. So can start with a copy of it.
     json = agent_data.copy()
 
     if agent_owner_data:        # Optional
         for k, v in agent_owner_data.items():
             json[k] = v
     else:
-        # Even if not specified, should really provide the values as None, as already stored in this agent as default.
+        # Even if not specified, will set the values as None (as stored in this agent by default).
         for k, v in agent_db(agent_name).agent_owner_data.items():
             json[k] = v
     
@@ -175,7 +191,7 @@ def register_new_agent(agent_name, agent_data, agent_owner_data, agent_owner_tra
         for k, v in agent_owner_transaction_config.items():
             json[k] = v
     else:
-         # Even if not specified, should really provide the values as None, as already stored in this agent as default.
+         # Even if not specified, will set the values as None (as stored in this agent by default).
         for k, v in agent_db(agent_name).agent_owner_transaction_config.items():
             json[k] = v
 
@@ -183,13 +199,12 @@ def register_new_agent(agent_name, agent_data, agent_owner_data, agent_owner_tra
     agent_password = agent_db(agent_name).create_new_agent_password(64)
     json['agent_password'] = agent_password
 
-    # TODO - create a human password, in case agent password is lost or for human authorization (see function recreate_agent_same_credentials()).
-
     # Now send a registration request.
     response = send_auth_message(agent_name, json, '/agent_auth/', 'POST')
 
     if response.success:
         # We need to be save this agent's unique password that allows it to access the Socontra network.
+        # We dont store the human password. That needs to be input in func connect_socontra_agent() if required.
         agent_data['agent_password'] = agent_password
 
         # Save the agent registered data in our local database, which at the moment is just files on the local machine.
@@ -202,17 +217,17 @@ def register_new_agent(agent_name, agent_data, agent_owner_data, agent_owner_tra
     return response
 
 
-def recreate_agent_same_credentials(agent_name, client_security_token):
+def recreate_agent_same_credentials(agent_name, client_security_token, human_password):
     # This function will check if this agent already exists on the Socontra Network, 
-    # ONLY IF the agent_name and client_security_token are exactly the same.
-    # TODO - need 2FA. Either human password or email verification. To implement.
+    # ONLY IF the agent_name and client_security_token are exactly the same AND the human_password matches.
 
     new_agent_password = agent_db(agent_name).create_new_agent_password(64)
 
     json_message = {
         "agent_name": agent_name,
         "client_security_token": client_security_token,
-        "new_password": new_agent_password
+        "new_password": new_agent_password,
+        "human_password": human_password
     }
 
     # Send the forgot password message. If the agent_name and client_security_token match, then (at the moment) the Socontra Network 
@@ -229,11 +244,9 @@ def recreate_agent_same_credentials(agent_name, client_security_token):
         agent_db(agent_name).update_client_security_token(client_security_token, False)
 
         # response_content should have all the agent data in it. So now can store it and save the info to file.
-        agent_db(agent_name).update_agent_data(response.message)
+        agent_db(agent_name).update_agent_data(response.http_response)
 
         response.http_response = 'Agent already registered and recreated via Soncontra Network.'
-    else:
-        print('Error connecting to the Socontra Network.', response.status_code, response.http_response)
 
     return response
 
@@ -326,7 +339,7 @@ def _send_auth_request(api_crud_type, socontra_network_url, socontra_network_api
 def endpoints_that_dont_need_access_tokens(path):
     # Will return true if path is an endpoint that does not need an access token.
     return path == '/agent_auth/' or path == '/agent_auth/agent_token' or path == '/agent_auth/forgot_password' \
-        or path == '/agent_auth/activate_agent'
+        or path == '/agent_auth/activate_agent' or path == '/agent_auth/check_agent_name'
 
 def get_access_token(agent_name):
     json_message = {
