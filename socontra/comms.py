@@ -315,7 +315,7 @@ def send_auth_message(agent_name, json_message, path, api_crud_type):
     })
 
     # Ensure that the next message to the Socontra Network is not instantly after this message, which can cause issues with sequence etc.
-    time.sleep(0.1)
+    # time.sleep(0.1)
 
     # print('HTTP Request response:', response_to_return.contents)
     return response_to_return
