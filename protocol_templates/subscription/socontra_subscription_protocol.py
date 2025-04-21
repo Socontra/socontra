@@ -1,4 +1,4 @@
-# Socontra template for the agent general subscription (broadcast) protocol, a general purpose 1-way broadcasting tool for agents.
+# Socontra template for the agent general subscription (broadcast) protocol, a general purpose 1-way 2-to-many broadcasting tool for agents.
 
 import time
 
@@ -14,7 +14,7 @@ def route(*args):
     return inner_decorator
 
 
-# ---- SOCONTRA GENERAL SUBSCRIPTION (BROADCAST) PROTOCOL ENDPOINTS ----- #
+# ---- SOCONTRA GENERAL SUBSCRIPTION (BROADCAST) PROTOCOL ENDPOINT ----- #
 
 @route('broadcast', 'subscription', 'socontra', 'recipient')  
 # -> response: NoComms - N/A

@@ -517,12 +517,12 @@ class Socontra:
         return http_response
 
 
-    def reject_offer(self, agent_name: str, message_responding_to: Message, offer: str | dict = None, message: str | dict = None, recipient_type: str='supplier'):
+    def reject_offer(self, agent_name: str, message_responding_to: Message, message: str | dict = None, recipient_type: str='supplier'):
         # This function will 'formally' reject an offer. The offer will subsequently be removed from the Socontra Network database.
 
         # Create a json message with the message variables to send to the Socontra Network.
         json_message = self.create_json_dict(agent_name=agent_name, message=message, message_responding_to=message_responding_to.contents,
-                                             offer=offer, message_type='reject_offer', recipient_type=recipient_type)
+                                             offer=None, message_type='reject_offer', recipient_type=recipient_type)
 
         http_response = send_auth_message(agent_name, json_message, '/agent_message/reject_offer/', 'PUT')
 

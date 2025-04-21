@@ -1,19 +1,18 @@
 # Socontra demo 6
-# We demonstrate the creation and joining of public groups ('open_public').
-# Note - can only run this demo successfully once (will try to edit group name to one that already exists, which is invalid).
+# We demonstrate the creation and joining of open public groups ('open_public').
+# Note - can only run this demo successfully once (as it will try to edit group name to one that already exists, which is invalid).
 
 # There are three types of groups:
-# - 'open_public' - Any agent can freely join these groups and they have 'public' visibility (search soon to be implemented).
+# - 'open_public' - Any agent can freely join these groups and they have 'public' visibility and are searchable.
 #                   Additionally, any agent can communicate with group members without needing to join the group.
-#          Applications of public groups:
-#          - Web Agents - Open public groups can be used Web Agents - agents that replace web sites and online stores (which are
-#                     designed for humans, hence why they use Captcha to prevent bots using them) with agents specifically 
-#                     designed for agents/bots to automate commercial transactions for goods and services or access data/info.
-#                   In this case, web agents join public groups that relate to services they sell or info/skills they provide
-#                   (e.g. groups titled Travel, Food delivery, Groceries, etc), and agents anywhere can use these groups
-#                   to find, interact and transact with web agents (group members) that address their needs.
+#        Applications of public groups:
+#          - Web Agents - Open public groups can be used for Web Agents - agents that replicate web sites and online stores designed
+#                     specifically for agents or bots to automate commercial transactions for goods and services, or access data/info.
+#                     In this case, web agents join public groups that relate to services they sell or info/skills they provide
+#                     (e.g. groups titled Travel, Food delivery, Groceries, etc). Agents can search for and use these groups
+#                     to find, interact and transact with web agents (group members) that address their needs.
 #          - B2A & Open Orchestration - Open public group can help facilitate B2A (Business-to-Agent business model) and open
-#                   orchestration where web agents provide services directly to other agents rather than their human users.
+#                     orchestration where web agents provide services directly to other agents rather than their human users.
 # - 'restricted_public' - Groups with public visibility but membership is restricted. Requests to join must be approved
 #                       by group admins, or group admins can invite agents to join. 
 #                       Invites can involve payment/fee to join, which is incorporated into the Socontra invite message.
@@ -24,13 +23,15 @@
 #   - message_category - 'message' for general purpose messages, 
 #                      - 'subscription' for broadcast messages (one-way messages), like a news or weather service, or
 #                      - 'service' for acheiving a task via agent-to-agent transactions for services. Includes automated
-#                        commercial transactions on behalf of agents' human users (more on this in a later demo).
+#                        commercial transactions on behalf of agents' human users or agents themselves (more on this in a later demo).
 #   - protocol - the common protocol that agents must use to interact within the group must be specified.
-#   - human_description - description of the group earchable for humans.
-#   - agent_description - description of the group that is more suited to agents/LLM search.
+#   - human_description - description of the group searchable by humans.
+#   - agent_description - description of the group that is more suited to search by agents/LLM.
 
-# Lastly, groups are named by their hierarchy, as a list starting with client_public_id. So a single group 'My group'
-# is references as [client_public_id, 'My group']. Sub-groups would be [client_public_id, 'My group', 'My sub-group'], etc.
+# Lastly, groups are named by their hierarchy, using a Python list starting with client_public_id. So a single group 'My group'
+# is referenced as [client_public_id, 'My group']. Sub-groups would be [client_public_id, 'My group', 'My sub-group'], etc.
+
+# Features in development: (1) search for groups and (2) addition of geographical region to groups.
 
 # We utilize the simple message protocol in demo 1 (protocol_templates/message/socontra_message_protocol1.py).
 
@@ -88,7 +89,9 @@ if __name__ == '__main__':
             'protocol' : 'socontra'
         })
     
-    # View all groups that the agent is admin of.
+    # View all groups that the agent is admin of. Note that the response is received in endpoint 
+    # @route('my_admin_groups', 'socontra_notifications', 'socontra', 'recipient') 
+    # contained in file protocol_templates/socontra_main_protocol.py
     socontra.get_admin_groups(group_admin_agent)
     time.sleep(1)
     
@@ -142,7 +145,7 @@ if __name__ == '__main__':
     socontra.remove_agent_from_group(agent_name=group_admin_agent, agent_name_removing=group_member_2, group_name_path=[client_public_id, 'Travel'])
     time.sleep(1)
 
-    # Even if agents are not members of the group, then can communicate with group members of public groups.
+    # Even if agents are not members of the group, they can communicate with group members of public groups.
     # Below we have group_member_1 ask members of the Travel group about travel (which now only group_admin_agent is a member).
     distribution_list = {
             # Specify groups that the agent is a member of to communicate with the groups' members.

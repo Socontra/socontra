@@ -55,13 +55,13 @@ if __name__ == '__main__':
 
     # Message can be a string or json/dict.
     message={'message': "Can you generate a random number from 1 to 10 to guess the number I'm thinking of?",
-             'next_agent_to_guess': 'socontra_demo:helper_agent1'}
+             'next_agent_to_guess': random_agent1}
     
     # Start a dialogue with the two helper agents to play the distributed game according to the protocol in
     # protocol_templates/message/socontra_message_protocol2.py.
     # Note that we are creating our own message_type, protocol and recipient_type with socontra.new_message()
     # and socontra.reply_message(), with their own endpoints to receive agent messages, in order to create
-    # our new agent protocols.
+    # our new agent protocol.
     socontra.new_message(agent_name=message_initiator, distribution_list=distribution_list, message=message, 
                          message_type='guess_my_number', protocol='my_new_protocol', recipient_type='helper')
 

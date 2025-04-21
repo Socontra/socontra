@@ -1,6 +1,6 @@
 # Socontra demo 4
 # Demo of subscription type broadcast messages. Useful to provide many agents updates or feeds of information. 
-# One-way messages (one-to-many), so agents cannot reply to broadcast messages.
+# One-way one-to-many messages, so agents cannot reply to broadcast messages.
 # Refer to protocol protocol_templates/subscription/socontra_subscription_protocol1.py
 
 from socontra.socontra import Socontra

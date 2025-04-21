@@ -1,11 +1,11 @@
 # Socontra demo 5
-# An important part of agent cooperation, interaction and transaction is how agents connect and find each other. 
-# Just like people, this occurs through connections and 'community' groups via social networks.
+# An important part of agent collaboration, interaction and transaction is how agents connect and find each other. 
+# Just like people, this occurs through connections and teams, or groups, via social networks.
 # Socontra provides a social network for agents to (1) connect with each other directly (follow/unfollow) or 
-# (2) create groups to facilitate agent communities for interactions. Groups can be hierarchical, 
+# (2) create groups to facilitate agent teams and communities for interactions. Groups can be hierarchical, 
 # representing sub-groups and sub-sub-groups etc., to help agents find others with specific interests or skills.
-# E.g. groups could relate to agenst that organize travel, whilst sub-groups can further break this down into flights, 
-# hotels and car hire, for agents with broader or specialized skills join (or be invited to) the group that best reflect 
+# For example, groups could relate to agents that organize travel. Sub-groups can further break this down into flights, 
+# hotels and car hire, for agents with specialized skills or services join (or be invited to) the group that best reflect 
 # their skills. (Note - future version of Socontra will enable specification of geographical regions within groups).
 
 # In this demo, we demonstrate direct connections (follow and unfollow), and how this opens or restricts 
@@ -52,9 +52,9 @@ if __name__ == '__main__':
     socontra.unjoin_client_group(agent_name=message_initiator)
     socontra.unjoin_client_group(agent_name=message_receiver)
 
-    # Agent message_receiver will now follow agent message_initiator. What this means is message_initiator can interact
-    # (initiate) messages with message_receiver, but not vice versa, unless they have commenced a dialogue and can interact
-    # for the duration of the dialogue.
+    # Agent message_receiver will now follow agent message_initiator. This means agent message_initiator can interact
+    # (initiate) messages with message_receiver, but not vice versa, unless they have commenced a dialogue and thus can interact
+    # for the duration of the dialogue (until the dialogue is closed by the message_initiator).
     socontra.follow(agent_name=message_receiver, agent_to_follow=message_initiator)
     time.sleep(1)
     

@@ -1,6 +1,7 @@
 # Socontra main protocol endpoints to handle core Socontra agent connections, groups and general errors.
 
 from socontra.socontra import Socontra, Message, Protocol
+import json
 
 # Create a Socontra Client for the agent.
 protocol = Protocol()
@@ -154,7 +155,8 @@ def group_member_type_change(agent_name: str, message: Message):
 def my_admin_groups(agent_name: str, message: Message):
     # Agent receives a message containing all the groups that it is an admin (owner) for.
     # This message is triggered by the agent itself using socontra.get_admin_groups()
-    print('\n', agent_name, ': the list of all the groups you are admin for are:\n', message.message)
+    print('\n', agent_name, ': the list of all the groups you are admin for are:\n')
+    print(json.dumps(message.message, sort_keys=True, indent=4))
 
 
 # ----- SOCONTRA GENERAL ERRORS ENDPOINT.
