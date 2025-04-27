@@ -81,17 +81,17 @@ class Socontra:
 
         prepare_agent_api(agent_data['agent_name'], self)
 
-        if is_agent_already_registered(agent_data['agent_name']):
+        if is_agent_already_registered(agent_data['agent_name'], agent_data['client_security_token']):
             # If new_agent - lets check if the agent credentials already stored in our database (files in folder socontra/database/). 
             response = agent_already_registered(agent_data['agent_name'], agent_data)
 
-            if not response:
+            if not response.success:
                 # Agent names exists. Will try to recreate the agent - if the agent is an existing registered agent trying to reconnect.
                 if 'human_password' in agent_data:
                     response_recreate = recreate_agent_same_credentials(agent_data['agent_name'], agent_data['client_security_token'], agent_data['human_password'])
                     if not response_recreate.success:                
                         # Can't create the agent (i.e conflict or unauthorized) - since an agent with same same name but different credentials exists.
-                        raise ValueError('Could not create agent. Agent with the same name exists, no local data about the agent exists, and human_password provided does not match with existing agent that is registered.')                        
+                        raise ValueError('Could not create agent. Agent with the same name exists, no local data about the agent exists, and either: human_password provided does not match with existing agent that is registered; or there was an error on the Socontra Network. Please try again.')                        
                     else:
                         response=response_recreate
                 else:
@@ -105,6 +105,9 @@ class Socontra:
                 raise ValueError('Agent registration fields are not valid. Please check and try again. See print message.')
             elif response.status_code == 401:
                 raise ValueError('Client could not be validated. Could not register agent. Re-check your client_public_id and client_security_token, or make sure you are registered with the Socontra Network.')
+            elif response.status_code == 500:
+                print(f'Error registering agent - Socontra Network error. Response: {response.contents}')
+                raise
                 
         # Connect the agent to the Socontra Network to receive messages via Server-Sent Events (SSE).
         self.connect_agent_to_socontra_network(agent_data['agent_name'], clear_backlog)

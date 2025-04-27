@@ -106,12 +106,18 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
     while True:
         try:
             # Get an access token from the Socontra Network.
-            access_token = get_access_token(agent_name)
+            access_token = agent_db(agent_name).get_socontra_access_token()
+            if not access_token:
+                access_token = get_access_token(agent_name)
 
-            response = requests.get(url, json={'agent_name': agent_name, 'clear_backlog': clear_backlog}, stream=True, headers=access_token)
+            if type(access_token) is dict:
+                response = requests.get(url, json={'agent_name': agent_name, 'clear_backlog': clear_backlog}, stream=True, headers=access_token)
+            else:
+                print(f"Could not connect agent {agent_name} to the Socontra Network - could not get access token for agent. Response: {access_token.contents}")
+                return access_token
 
             if response.status_code >= 400:
-                print("Could not connect agent to the Socontra Network.")
+                print(f"Could not connect agent {agent_name} to the Socontra Network.")
                 return response
 
             client = SSEClient(response)
@@ -137,15 +143,16 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
 
                 expect_multiple_thread.start()
         except:
-            print('Trouble connecting to the Socontra Network. Will try again soon.')
-            time.sleep(2)
+            print(f'Trouble connecting agent {agent_name} to the Socontra Network. Will try again soon.')
+            time.sleep(5)
 
 
 # Agent registration functions.
 
-def is_agent_already_registered(agent_name):
+def is_agent_already_registered(agent_name, client_security_token):
     # Will check with the Socontra Server to see if the agent name is already registered.
-    json = {'agent_name': agent_name}
+    json = {'agent_name': agent_name,
+            'client_security_token': client_security_token}
     response = send_auth_message(agent_name, json, '/agent_auth/check_agent_name', 'GET')
     return not response.success
 
@@ -160,8 +167,9 @@ def agent_already_registered(agent_name, agent_data):
         # To find out, we will simply ask for an access token from the Socontra Network, which uses the stored password.
         access_token = get_access_token(agent_name)
 
-        if not access_token:
-            return False
+        if type(access_token) is not dict:
+            # agent could not be authorized with its credentials.
+            return access_token
         else:
             # Create an artificial response object to send back.
             return MessageHTTPResponse({
@@ -170,6 +178,14 @@ def agent_already_registered(agent_name, agent_data):
                 'http_response': 'Agent already registered and created locally',
                 'status_code': 200
             })
+    else:
+        # Create an artificial response object to send back.
+        return MessageHTTPResponse({
+            'success': False,
+            'message': None,
+            'http_response': 'Agent already registered but credentials are not stored locally. Will need to extract agent details from the Socontra Server, only if this agents is the same as the existing registered agent.',
+            'status_code': 404
+        })
 
 
 def register_new_agent(agent_name, agent_data, agent_owner_data, agent_owner_transaction_config):
@@ -237,16 +253,25 @@ def recreate_agent_same_credentials(agent_name, client_security_token, human_pas
     if response.success:
         # Now that the password is reset, lets get all the details about us from the agent.
         agent_db(agent_name).update_agent_password(new_agent_password, False)
-        get_access_token(agent_name)        # We know we will need an access token for the request.
-        response = send_auth_message(agent_name, {}, '/agent_admin/my_agent_data', 'GET')
+        access_token = get_access_token(agent_name)        # We know we will need an access token for the request.
 
-        # Save the client_security_token encrypted.
-        agent_db(agent_name).update_client_security_token(client_security_token, False)
+        if type(access_token) is dict:
+            response = send_auth_message(agent_name, {}, '/agent_admin/my_agent_data', 'GET')
+        else:
+            print(f"Error getting access token for agent: {access_token.contents}")
+            return access_token
 
-        # response_content should have all the agent data in it. So now can store it and save the info to file.
-        agent_db(agent_name).update_agent_data(response.http_response)
+        if response.success:
 
-        response.http_response = 'Agent already registered and recreated via Soncontra Network.'
+            # Save the client_security_token encrypted.
+            agent_db(agent_name).update_client_security_token(client_security_token, False)
+
+            # response_content should have all the agent data in it. So now can store it and save the info to file.
+            agent_db(agent_name).update_agent_data(response.http_response)
+
+            response.http_response = 'Agent already registered and recreated via Soncontra Network.'
+        else:
+            print(f'Error connecting agent: {response.contents}')
 
     return response
 
@@ -281,17 +306,18 @@ def send_auth_message(agent_name, json_message, path, api_crud_type):
         access_token = get_access_token(agent_name)
 
         # Resend the auth message.
-        if access_token:
+        if type(access_token) is dict:
             res = _send_auth_request(api_crud_type, socontra_network_url, socontra_network_api_port, socontra_network_path, json_message, access_token)
         else:
-            return False
+            # Error getting access token for agent to connect to the Socontra Network.
+            return access_token
     
     # If there is an error on the Socontra Network, print a message and return from this function.
     if res.status_code == 500:
-        print('There was an error on the Socontra Network. Action could not be completed.')
+        print(f'There was an error on the Socontra Network. Action could not be completed. Response: {res.content}')
         return MessageHTTPResponse({
                 'success': False,
-                'http_response': res.content,
+                'http_response': str(res.content),
                 'message': 'There was an error on the Socontra Network. Action could not be completed.',
                 'status_code': res.status_code
             })
@@ -357,7 +383,7 @@ def get_access_token(agent_name):
         return access_token
     else:
         # error with getting access, return false.
-        return False
+        return response_content
 
 
 # Get the database object for the specific agent. Need to do this because there could be multiple agents

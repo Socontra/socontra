@@ -36,7 +36,7 @@ def game_orchestrator(agent_name, distribution_list, random_agent1, random_agent
         guessed_number = guess_returned['guessed_number']
         sender_agent = guess_returned['sender']
 
-        print(f'\nThe number I have is {random_number} and the number guessed by agent {sender_agent} is {guessed_number}/n')
+        print(f'\nThe number I have is {random_number} and the number guessed by agent {sender_agent} is {guessed_number}\n')
 
         if guessed_number == random_number:
             message=f'{sender_agent} has guessed the number!! Congrats!\n'

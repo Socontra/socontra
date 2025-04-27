@@ -22,7 +22,7 @@ def route(*args):
 def agent_followed_notification(agent_name: str, message: Message):
     # Messages for being followed by agents.
 
-    print(agent_name, 'is being followed by ', message.sender_name)
+    print(f"{agent_name} is being followed by {message.sender_name}")
 
 
 @route('unfollowed', 'socontra_notifications', 'socontra', 'recipient')  
@@ -30,7 +30,7 @@ def agent_followed_notification(agent_name: str, message: Message):
 def agent_unfollowed_notification(agent_name: str, message: Message):
     # Messages for being unfollowed by agents.
 
-    print(agent_name, 'is being unfollowed by ', message.sender_name)
+    print(f"{agent_name} is being unfollowed by {message.sender_name}")
 
 
 @route('request_to_join_group', 'socontra_notifications', 'socontra', 'recipient') 
