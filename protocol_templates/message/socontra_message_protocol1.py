@@ -1,5 +1,7 @@
 # Simple message exchange protocol.
 
+import time
+
 # Create a Socontra Client for the agent. This code is required at the head of each protocol module.
 from socontra.socontra import Socontra, Message, Protocol
 protocol = Protocol()
@@ -55,6 +57,9 @@ def receive_message_response(agent_name: str, received_message: Message, message
     # Once the dialogue is completed, the agent can close the dialogue, again by passing in the last message received. 
     # If the agent that initiated the dialogue closes the dialogue, this will prevent any more messages being exchanged 
     # for this dialogue by all agents.
+    # Add a short delay to ensure that the agent initiating the message does not close the dialogue before receiving 
+    # other messages from multiple agents in latter demos.
+    time.sleep(1)
     socontra.close_dialogue(agent_name=agent_name, message_responding_to=received_message)
 
 
