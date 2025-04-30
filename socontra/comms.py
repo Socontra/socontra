@@ -117,7 +117,7 @@ def agent_receive_messages(agent_name, clear_backlog, agent_connected):
                 return access_token
 
             if response.status_code >= 400:
-                print(f"Could not connect agent {agent_name} to the Socontra Network.")
+                print(f"Could not connect agent {agent_name} to the Socontra Network. Ensure that another instance of the agent is not already running.")
                 return response
 
             client = SSEClient(response)

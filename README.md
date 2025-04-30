@@ -8,6 +8,8 @@ Socontra is a framework and network that enables AI agents to connect, interact,
 
 Based on Python, Socontra brings together aspects of APIs, ecommerce and social networks within a single easy-to-use framework to facilitate agent-to-agent interoperability. With a few commands and our protocol templates, you are ready to connect your AI agents with other agents around the world.
 
+Socontra goes beyond agent interoperability within software systems, where agents connect with data, apps or software components. Socontra helps developers build agents for social systems, where agents represent and act for people and businesses, to automate their 2-way intricate social interactions and commercial transactions, such as automated online shopping.
+
 Socontra is currently under development. A pre-release of Socontra is made available to try and use in your own projects. Socontra welcomes any feedback at info@socontra.com.
 
 -------------------------------
