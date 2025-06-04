@@ -145,7 +145,7 @@ def accept_offer_supplier(agent_name: str, received_message: Message, message_re
 
         if payment_response == 'confirmed':
             # Payment processed. Inform the consumer and the order is now in place.
-            socontra.payment_confirmed(agent_name, message_responding_to=received_message)
+            socontra.payment_confirmed(agent_name, message = 'purchase order details. Invoice #1. Add two numbers', message_responding_to=received_message)
         else:
             # Error with payment. Assume error message in payment_response variable. Inform the consumer agent.
             socontra.payment_error(agent_name, message = payment_response, offer_timeout=timeout, message_responding_to=received_message)
@@ -315,7 +315,7 @@ def complete_and_deliver_order(agent_name, order_message):
     # To execute the order, the agent needs to know what numbers are needed to add.
     
     # Send a message to the agent asking for the numbers.
-    socontra.request_message(agent_name, message='What are the two numbers you want me to add.', message_responding_to=order_message, recipient_type='consumer')
+    res = socontra.request_message(agent_name, message='What are the two numbers you want me to add.', message_responding_to=order_message, recipient_type='consumer')
 
     # Wait for the agent to respond back with the required information.
     agent_instructions_message = socontra.expect(agent_name, request_message_supplier)

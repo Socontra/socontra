@@ -39,7 +39,7 @@ def request_to_join_group(agent_name: str, message: Message):
     # Agent has received a request to join a group that it is an admin for (for 'restricted_open' groups).
     # Message was triggered by: socontra.join_group()
     # Note if the group has multiple admins, all the admins will receive this 'request_to_join_group'.
-    print('You have a received a request to join the group ', message.message, ' which you are an admin, from agent ', message.sender_name)
+    print(f'You have a received a request to join the group {message.message} which you are an admin, from agent {message.sender_name} \n')
 
     # -> Responses are:
     # socontra.accept_join_request(agent_name, message)
@@ -62,11 +62,11 @@ def request_to_join_group_response(agent_name: str, message: Message):
     #       - restricted_private groups - join request is always rejected automatically - have to be invited by admins, can't request to join.
     
     if socontra.get_response(message) == 'accepted':
-        print('\n', agent_name, 'request to join the group ', socontra.get_group_name(message), ' has been accepted')
+        print(f'{agent_name} request to join the group {socontra.get_group_name(message)} has been accepted \n')
     elif socontra.get_response(message) == 'rejected':
-        print('\n', agent_name, 'request to join the group ', socontra.get_group_name(message), ' has been rejected')
+        print(f'{agent_name} request to join the group {socontra.get_group_name(message)} has been rejected \n')
     elif socontra.get_response(message) == 'unauthorized':
-        print('\n', agent_name, 'request to join the group ', socontra.get_group_name(message), ' has been automatically rejected because it is a restricted private group - you can only be invited by group admins')
+        print(f'{agent_name} request to join the group {socontra.get_group_name(message)} has been automatically rejected because it is a restricted private group - you can only be invited by group admins \n')
 
     # socontra.agent_return(agent_name, request_to_join_group_response, message=message.message)
 
@@ -150,15 +150,6 @@ def group_member_type_change(agent_name: str, message: Message):
     print('\n', agent_name, 'member type for group ', socontra.get_group_name(message),' has been changed to ', socontra.get_member_type(message), ' by a group admin')
 
 
-@route('my_admin_groups', 'socontra_notifications', 'socontra', 'recipient') 
-# -> response: N/A
-def my_admin_groups(agent_name: str, message: Message):
-    # Agent receives a message containing all the groups that it is an admin (owner) for.
-    # This message is triggered by the agent itself using socontra.get_admin_groups()
-    print('\n', agent_name, ': the list of all the groups you are admin for are:\n')
-    print(json.dumps(message.message, sort_keys=True, indent=4))
-
-
 # ----- SOCONTRA GENERAL ERRORS ENDPOINT.
 
 # Receive errors for the protocol specified above.
@@ -180,7 +171,25 @@ def general_errors(agent_name: str, error_message: str, message_sent: Message):
 
 def get_human_user_payment_data(agent_name):
     # Will get payment data/method from the human user of the agent.
-    return {'credit_card': 'xxxx xxxx xxxx xxxx'}
+    payment_example = {
+        'primary': {
+            'method': 'credit_card',
+            'details': {
+                'cardholder_name': 'John Doe',
+                'card_number': '1111222233334444',
+                'expiry_date_month': 1,
+                'expiry_date_year': 1,
+                'cvv': '1234',
+                'zip_postal_code': '94109',
+            }
+        },
+        'secondary': {
+            'method': 'cryptocurrency',
+            'details': 'to go here'
+        }
+    }
+
+    return payment_example
 
 def get_human_user_authorization_for_payment(agent_name):
     # Will get authorization from human user for payment.

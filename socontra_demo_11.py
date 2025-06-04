@@ -21,7 +21,6 @@ socontra.add_protocol(socontra_main_protocol)
 socontra.add_protocol(socontra_transact_protocol_consumer)
 socontra.add_protocol(socontra_transact_protocol_supplier)
 
-
 if __name__ == '__main__':
 
     # Enter your credentials in the config.py file.
@@ -72,6 +71,11 @@ if __name__ == '__main__':
             #            'global' (includes sub-groups and parent groups), and 'exclusive' (includes parent groups).
             #  'groups' :[{}, {}]
 
+            # List the region(s) relevant to the required services.
+            #'regions': [
+            #               {'country': <country>, 'state': <state>, 'city': city}
+            #       ],
+
             # List names of agent names for direct agent-to-agent communication. The sender agent must be 'connected to' recipient agents. 
             'direct' : [supplier_agent1, supplier_agent2, supplier_agent3],
         }
@@ -90,5 +94,3 @@ if __name__ == '__main__':
     # For the Socontra transact protocol, we use a central orchestrator, contained in the protocol template file
     # protocol_templates/service/socontra_transact_protocol_consumer.py.
     socontra.transact_orchestrator_consumer(consumer_agent, task, distribution_list, proposal_timeout, invite_offer_timeout)
-
-    

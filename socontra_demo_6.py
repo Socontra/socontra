@@ -5,6 +5,8 @@
 # There are three types of groups:
 # - 'open_public' - Any agent can freely join these groups and they have 'public' visibility and are searchable.
 #                   Additionally, any agent can communicate with group members without needing to join the group.
+#                   Socontra provides predefined 'socontra' groups for public online stores to use, listed in 
+#                   data/socontra_public_groups.json (based on Yelp business categories).
 #        Applications of public groups:
 #          - Web Agents - Open public groups can be used for Web Agents - agents that replicate web sites and online stores designed
 #                     specifically for agents or bots to automate commercial transactions for goods and services, or access data/info.
@@ -41,6 +43,7 @@ from protocol_templates import  socontra_main_protocol
 from protocol_templates.message import  socontra_message_protocol1
 import config
 import time
+from pprint import pprint
 
 socontra = Socontra()
 socontra.add_protocol(socontra_main_protocol)
@@ -89,10 +92,10 @@ if __name__ == '__main__':
             'protocol' : 'socontra'
         })
     
-    # View all groups that the agent is admin of. Note that the response is received in endpoint 
-    # @route('my_admin_groups', 'socontra_notifications', 'socontra', 'recipient') 
-    # contained in file protocol_templates/socontra_main_protocol.py
-    socontra.get_admin_groups(group_admin_agent)
+    # View all groups that the agent is a member (member or admin).
+    # Results returned in http response response.http_response
+    response = socontra.get_groups(group_admin_agent)
+    pprint(response.http_response)
     time.sleep(1)
     
     # group_member_1 and group_member_2 can freely join the group. Membership is instant and does not require approval.
@@ -134,7 +137,8 @@ if __name__ == '__main__':
     time.sleep(1)
 
     # View the groups again to see the edits.
-    socontra.get_admin_groups(group_admin_agent)
+    response = socontra.get_groups(group_admin_agent)
+    pprint(response.http_response)
     time.sleep(1)
 
     # Agent can remove themselves from groups.
@@ -157,6 +161,11 @@ if __name__ == '__main__':
                             'group_scope': 'local',   
                         },
                     ],
+
+            # List the region(s) relevant to the required services. Discussed in demo 7 part 2.
+            # 'regions': [
+            #               {'country': <country>, 'state': <state>, 'city': city}
+            #       ],
 
             # List names of agent names for direct agent-to-agent communication. The sender agent must be 'connected to' recipient agents. 
             # 'direct' : [],

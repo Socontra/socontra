@@ -91,7 +91,7 @@ class Socontra:
                     response_recreate = recreate_agent_same_credentials(agent_data['agent_name'], agent_data['client_security_token'], agent_data['human_password'])
                     if not response_recreate.success:                
                         # Can't create the agent (i.e conflict or unauthorized) - since an agent with same same name but different credentials exists.
-                        raise ValueError('Could not create agent. Agent with the same name exists, no local data about the agent exists, and either: human_password provided does not match with existing agent that is registered; or there was an error on the Socontra Network. Please try again.')                        
+                        raise ValueError('Could not create agent. Agent with the same name exists, no local data about the agent exists, and either: human_password provided does not match with existing agent that is registered; client_security_token is incorrect, or there was an error on the Socontra Network. Please try again.')                        
                     else:
                         response=response_recreate
                 else:
@@ -281,10 +281,78 @@ class Socontra:
         # Now that check are complete, send the create group request.
         return send_auth_message(agent_name, edit_group_config, '/agent_groups/edit_group', 'PUT')
 
-
-    def get_admin_groups(self, agent_name):
-        # Will return (via agent message) all the groups that this agent is an admin for.
+    def get_groups(self, agent_name: str):
+        # Will return (via agent message) all the groups that this agent is an admin for or a member of.
+        # Will return results in the http response.
         return send_auth_message(agent_name, {}, '/agent_groups/groups', 'GET')
+    
+    def get_sub_groups(self, agent_name: str, group_name_path: list[str]):
+        # Will return the group and sub-groups for group_name_path. Can only perform this command for groups
+        # that the agent is member for or are 'restricted_public' or 'open_public'.
+        # Will return results in the http response, and only a maximum of 350 subgroups.
+        self.validate_group_name(group_name_path)
+        json_message = {
+            'group_name': group_name_path,
+        }
+        return send_auth_message(agent_name, json_message, '/agent_groups/subgroups', 'GET')
+
+    def search_groups(self, agent_name: str, client_public_id: str = None, group_name_term: str = None, human_description_term: str = None, agent_description_term: str = None):
+        # Will search for non-private groups which contain terms for group_name (group_name_term), human_description 
+        # (human_description_term) and agent_description (agent_description_term). Will search if the exact string can be found
+        # in the group name or description, and is case insensitive.
+        # Will return results in the http response, and only a maximum of 350 groups.
+
+        if not group_name_term and not human_description_term and not agent_description_term:
+            raise ValueError('get_groups_search: must specify at least one search term for group_name_term, human_description_term or agent_description_term')
+        json_message = {
+            'client_public_id': client_public_id,
+            'group_name_term': group_name_term,
+            'human_description_term': human_description_term,
+            'agent_description_term': agent_description_term
+        }
+        return send_auth_message(agent_name, json_message, '/agent_groups/search_groups', 'GET')
+
+    def add_region_group(self, agent_name: str, group_name_path: list[str], list_of_regions: list[dict[str]]):
+        # Will add a list of geographical regions associated with group group_name_path which the agent
+        # is (or must be) a member of.
+        # If incorrectly specified, Socontra Network will return an error http response. The list_of_regions format is:
+        # list_of_regions = [
+        #                       {'country': '<country code or name>', 'state': '<state code or name>', 'city': <city name>},
+        #                       {...}, ...
+        #                   ]
+        # <country code or name>, <state code or name> and <city name>  must be the name or ISO codes from country-state-city
+        # database from https://github.com/dr5hn/countries-states-cities-database/tree/master (as of May 2025, json file provided 
+        # in the socontra/data folder).
+        self.validate_group_name(group_name_path)
+        self.validate_regions(list_of_regions)
+        json_message = {
+            'group_name': group_name_path,
+            'region_list': list_of_regions
+        }
+        return send_auth_message(agent_name, json_message, '/agent_groups/add_region_groups', 'POST')
+         
+    def delete_region_group(self, agent_name: str, group_name_path: list[str], list_of_regions: list[dict[str]]):
+        # Will delete a list of geographical regions associated with group group_name_path which the agent
+        # is (or must be) a member of.
+        # If incorrectly specified, Socontra Network will return an error http response.
+        # See function add_region_group() for more information on the format for list_of_regions.
+        self.validate_group_name(group_name_path)
+        self.validate_regions(list_of_regions)
+        json_message = {
+            'group_name': group_name_path,
+            'region_list': list_of_regions
+        }
+        return send_auth_message(agent_name, json_message, '/agent_groups/delete_region_groups', 'DELETE')
+
+    def get_region_group(self, agent_name: str, group_name_path: list[str]):
+        # Will return all the geographical regions associated with group group_name_path which the agent is a member of.
+        # Will return the list in the http response.
+        self.validate_group_name(group_name_path)
+        json_message = {
+            'group_name': group_name_path,
+        }
+        return send_auth_message(agent_name, json_message, '/agent_groups/get_region_groups', 'GET')
+
 
     # ------------ AGENT PROTOCOL MESSAGES
 
@@ -937,7 +1005,7 @@ class Socontra:
 
     def validate_distribution_list(self, distribution_list):
         # Will validate the distribution list and return True if ok and False otherwise.
-        # Note: regions, region_scope and blind are not yet implemented.
+        # Region names must be consistent with data/countries+states+cities.json from https://github.com/dr5hn/countries-states-cities-database.
 
         # distribution_list = {
         #   'groups' : [
@@ -950,18 +1018,17 @@ class Socontra:
         #           {...}, {...}, ...
         #         ],
         #     ],
+        #   'regions': [
+        #               {'country': <country>, 'state': <state>, 'city': city}
+        #       ],
         #   'direct' : ['socontra_demo:supplier_agent_1'],
-        #   'blind': False          # NOT IMPLEMENTED YET. If the consumer agent does not want the recipients to know who it is message - only allows 1:1 responses to the message. 
-        #   }
-
-
-        # list_of_groups is in format:
-        
+        #   }        
 
         if type(distribution_list) == str:
             return True
         elif type(distribution_list) != dict:
             return False
+        
         # If here, the distribution list is a dict. Check the components are there as required.
         # Check if contains either direct or group distribution list.
         if 'groups' not in distribution_list and 'direct' not in distribution_list:
@@ -969,6 +1036,7 @@ class Socontra:
         # Direct must be a list.
         if 'direct' in distribution_list and type(distribution_list['direct']) != list:
             return False
+        
         # Groups must be a list
         if 'groups' in distribution_list and type(distribution_list['groups']) != list:
             return False
@@ -983,10 +1051,46 @@ class Socontra:
                 if not (group_distribution['group_scope'] == 'local' or group_distribution['group_scope'] == 'direct' or \
                         group_distribution['group_scope'] == 'global' or group_distribution['group_scope'] == 'exclusive'):
                     return False
-            return True
-        else:
-            return True
         
+        # If regions are specified, regions must be a list.
+        if 'regions' in distribution_list and type(distribution_list['regions']) != list:
+            return False
+        elif 'regions' in distribution_list:
+            # Go through each element in the list and make sure contains the correct elements.
+            # Actual names of country, state and city will be chgecked on the Socontra Network.
+            for a_region in distribution_list['regions']:
+                # Need at least country.
+                if 'country' not in a_region:
+                    return False
+                # If specifiy city, must have state specified.
+                if 'city' in a_region and 'state' not in a_region:
+                    return False
+        
+        return True
+        
+    def validate_regions(self, list_of_regions):
+        # Will validate the regions list. Should be in format:
+        #   [
+        #       {'country': <country>, 'state': <state>, 'city': city},
+        #       {...}
+        #   ],
+
+        # list_of_regions should be a list.
+        if  type(list_of_regions) != list:
+            raise ValueError('list_of_regions must be a list.')
+
+        # Go through each element in the list and make sure contains the correct elements.
+        # Actual names of country, state and city will be chgecked on the Socontra Network.
+        for a_region in list_of_regions:
+            # Need at least country.
+            if 'country' not in a_region:
+                 raise ValueError('Each region in list_of_regions must specify a country.')
+            # If specifiy city, must have state specified.
+            if 'city' in a_region and 'state' not in a_region:
+                raise ValueError('Each region in list_of_regions must specify a state if the city is specified.')
+        
+        return True
+
     def create_group_validation(self, group_config):
         # Will validate create group configuration.
         '''socontra.create_group({

@@ -72,6 +72,11 @@ if __name__ == '__main__':
             #            'global' (includes sub-groups and parent groups), and 'exclusive' (includes parent groups).
             #  'groups' :[{}, {}]
 
+            # List the region(s) relevant to the required services.
+            #'regions': [
+            #               {'country': <country>, 'state': <state>, 'city': city}
+            #       ],
+
             # List names of agent names for direct agent-to-agent communication. The sender agent must be 'connected to' recipient agents. 
             'direct' : [supplier_agent1, supplier_agent2, supplier_agent3],
         }

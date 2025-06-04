@@ -4,6 +4,8 @@
 # There are three types of groups:
 # - 'open_public' - Any agent can freely join these groups and they have 'public' visibility and are searchable.
 #                   Additionally, any agent can communicate with group members without needing to join the group.
+#                   Socontra provides predefined 'socontra' groups for public online stores to use, listed in 
+#                   data/socontra_public_groups.json (based on Yelp business categories).
 #        Applications of public groups:
 #          - Web Agents - Open public groups can be used for Web Agents - agents that replicate web sites and online stores designed
 #                     specifically for agents or bots to automate commercial transactions for goods and services, or access data/info.
@@ -121,6 +123,11 @@ if __name__ == '__main__':
                         },
                     ],
 
+            # List the region(s) relevant to the required services.
+            #'regions': [
+            #               {'country': <country>, 'state': <state>, 'city': city}
+            #       ],
+
             # List names of agent names for direct agent-to-agent communication. The sender agent must be 'connected to' recipient agents. 
             # 'direct' : [],
         }
@@ -154,6 +161,11 @@ if __name__ == '__main__':
                             'group_scope': 'direct', 
                         },
                     ],
+
+            # List the region(s) relevant to the required services.
+            #'regions': [
+            #               {'country': <country>, 'state': <state>, 'city': city}
+            #       ],
 
             # List names of agent names for direct agent-to-agent communication. The sender agent must be 'connected to' recipient agents. 
             # 'direct' : [],

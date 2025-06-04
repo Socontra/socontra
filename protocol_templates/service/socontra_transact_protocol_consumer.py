@@ -116,7 +116,8 @@ def payment_confirmed_consumer(agent_name: str, received_message: Message, messa
     # We can also socontra.close_agents() if we want to stop a dialogue with a specific agent.
     socontra.close_message(agent_name, close_message_type=['offer', 'reject_invite_offer', 'revoke_offer', 'proposal', 'reject_task'], message_responding_to=received_message)
     
-    print('\nPayment for order successful. Order to fulfill task in progress by ', received_message.sender_name, '. The (purchase) order is ', received_message.order, '\n')
+    print('\nPayment for order successful. Order to fulfill task in progress by ', received_message.sender_name, '. The (purchase) order is ', received_message.order, 
+          ' and the details of the order are ', received_message.message, '\n')
      
      # Return the message back to the consumer orchestrator to track and manage the order completion and delivery.
     socontra.agent_return(agent_name, payment_confirmed_consumer, received_message=received_message)
@@ -346,7 +347,7 @@ def selection_and_commitment(agent_name, ordered_list_of_proposals, invite_offer
 
             # Wait for payment confirmation if payment required.
             if offer.payment_required:
-                message_type, invite_offer_response = socontra.expect_multiple(agent_name, [payment_confirmed_consumer, payment_error_consumer], timeout=60)
+                message_type, accept_offer_response = socontra.expect_multiple(agent_name, [payment_confirmed_consumer, payment_error_consumer], timeout=60)
 
                 # If no response or payment error, then in this example, we will try another proposal.
                 if message_type == None or message_type == 'payment_error_consumer':
@@ -398,7 +399,7 @@ def execution_monitoring_and_delivery(agent_name):
                 socontra.order_confirm_success(agent_name, message='Thank you, much appreciated.', message_responding_to=order_message)
 
                 # Perform any finalization or wrap up tasks and successfully exit.
-                successful_exit(agent_name, order_message)
+                return successful_exit(agent_name, order_message)
             
             else:
                 # Let the supplier agent know that the order not completed/delivered successfully as promised.
@@ -439,9 +440,26 @@ def get_human_authorization(agent_name, offer):
 
 def get_payment_details(agent_name):
     # Get payment details or method that will allow the supplier agent to make the purchase.
-    pass
-    return {'card_number': 'xxxx xxxx xxxx xxxx',
-            'secondary_payment': 'hugs'}
+
+    payment_example = {
+        'primary': {
+            'method': 'credit_card',
+            'details': {
+                'cardholder_name': 'John Doe',
+                'card_number': '1111222233334444',
+                'expiry_date_month': 1,
+                'expiry_date_year': 1,
+                'cvv': '1234',
+                'zip_postal_code': '94109',
+            }
+        },
+        'secondary': {
+            'method': 'cryptocurrency',
+            'details': 'to go here'
+        }
+    }
+
+    return payment_example
 
 def consumer_requires_authorization(agent_name, offer):
     # The consumer requires (or has requested) authorization before purchase.
