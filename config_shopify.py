@@ -32,7 +32,7 @@ api_version_admin = '2025-01'
 # consumer agent or agent owner utilize Yelp to confirm your store's credibility.
 # You can also create your own public groups (open or restricted).
 # Geographical regions are specified using 'country', 'state', and 'city', which must utilize names in the file 
-# data/countries+states+cities.json which is from https://github.com/dr5hn/countries-states-cities-database/tree/master.
+# data/countries+states+cities.json which is from https://github.com/dr5hn/countries-states-cities-database.
 # Example is:
 business_categories_and_regions = [
     {'group': ['socontra', 'Restaurants', 'Australian'],    # Web Agent online store sells/delivers Australian food.

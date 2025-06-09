@@ -15,7 +15,7 @@
 #             ]
 
 # The region names for country, state and city must be consistent with the file data/countries+states+cities.json
-# -> source is https://github.com/dr5hn/countries-states-cities-database/tree/master
+# -> source is https://github.com/dr5hn/countries-states-cities-database
 
 # Country is mandatory, however state and city are not.
 # If no regions are specified, either by the sender or receiver (agent group member), all agents will be sent the message by the sender.
@@ -206,9 +206,8 @@ if __name__ == '__main__':
     pprint(response.http_response)
 
     # Agents can also delete regions for groups they are members of.
-    response = socontra.delete_region_group(hotel_agent, [client_public_id, 'Travel', 'Hotel'], [{'country': 'US', 'state': 'AZ'}])
+    socontra.delete_region_group(hotel_agent, [client_public_id, 'Travel', 'Hotel'], [{'country': 'US', 'state': 'AZ'}])
     print('\n----------------------------------Hotel agent deletes Arizona as a region to service---------------------------------\n')
-    pprint(response.http_response)
 
     # Get and print out the updated list of regions for the group.
     response = socontra.get_region_group(hotel_agent, [client_public_id, 'Travel', 'Hotel'])
